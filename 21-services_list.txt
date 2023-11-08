@@ -1,0 +1,18 @@
+Alerter
+Automatic Upadates
+Clipbook
+Computer Browser
+Cyptographic Service
+DHCP Client
+Distributed Link Tracking Clinet, Server
+DNS Client
+Error reporting Service
+Human Interface Device Access
+IMAPI CD-Burning COM Service
+Messenger
+NetMeeting Remote Desktop Sharing
+Portable Media Serial Number
+Print Spooler
+Remote Registry
+Simple TCP/IP Services
+Wireless Zero Configuration
