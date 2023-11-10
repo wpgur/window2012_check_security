@@ -1833,30 +1833,26 @@ REM -------------------------------------------9. W-27. IIS 웹 프로세스 권
 ECHO [W27] IIS 웹 프로세스 권한 제한.
 setlocal enabledelayedexpansion
 
-:ACCOUNT_W-27_again
-set /p "webAppPath=웹 애플리케이션 경로를 입력하세요[ex)C:\Inetpub\wwwroot\yourapp , C:\web]: "
+secedit /export /cfg secpol.txt >nul
 
-if not exist "!webAppPath!" (
-    ECHO 웹 애플리케이션 경로가 존재하지 않습니다 다시 입력해주세요.
-    goto ACCOUNT_W-27_again
-)
+REM 확인 결과를 파일에서 찾습니다.
+type secpol.txt | find/i "SeServiceLogonRight" | find/i "nobody" >nul
 
-icacls "!webAppPath!" | findstr /C:"NT SERVICE\W3SVC" > nul
 if errorlevel 1 (
     ECHO. >> bad.txt
     ECHO --------------------------------------------------------------------------------- >> bad.txt
     ECHO. >> bad.txt
     ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 취약 ] >> bad.txt
     ECHO. >> bad.txt
-    ECHO 설명 : 웹 프로세스가 관리자 권한이 부여된 계정으로 구동되고 있어 취약합니다. >> bad.txt
+    ECHO 설명 : 로컬 보안 정책 ^> 로컬 정책^> 사용자 권한에 "nobody" 계정이 누락되어 웹 프로세스가 관리자 권한이 부여된 계정으로 운영 중인 것으로 간주하여, 이를 취약으로 판단합니다. >> bad.txt
     ECHO. >> bad.txt
     ECHO [보안 조치] >> bad.txt
     ECHO. >> bad.txt
     ECHO ■ Windows NT, 2000, 2003 >> bad.txt
     ECHO. >> bad.txt
     ECHO [Step 1] "시작> 제어판> 관리도구> 컴퓨터 관리> 로컬 사용자 및 그룹> 사용자 선택" >> bad.txt
-    ECHO [Step 2] "nobody 계정 추가 -> nobody 계정의 소속 그룹에 정해진 User가 있으면 제거" >> bad.txt
-    ECHO [Step 3] "시작> 제어판> 관리도구> 로컬 보안 정책> 로컬 정책> 사용자 권한 할당 선택, "서비스 로그온"에 "nobody" 계정 추가" >> bad.txt
+    ECHO [Step 2]" nobody 계정 추가 -> nobody 계정의 소속 그룹에 정해진 User가 있으면 제거" >> bad.txt
+    ECHO [Step 3] "시작> 제어판> 관리도구> 로컬 보안 정책> 로컬 정책> 사용자 권한 할당 선택", "서비스 로그온"에 "nobody" 계정 추가 >> bad.txt
     ECHO [Step 4] "시작> 실행> SERVICES.MSC> IIS Admin Service> 속성> [로그온] 탭의 계정 지정에 nobody 계정 및 패스워드 입력" >> bad.txt
     ECHO [Step 5] "시작> 프로그램> 윈도우 탐색기> IIS 가 설치된 폴더 속성> [보안] 탭에서 nobody 계정을 추가하고 모든 권한 체크" >> bad.txt
     ECHO. >> bad.txt
@@ -1868,40 +1864,90 @@ if errorlevel 1 (
     ECHO. 
     ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 취약 ] 
     ECHO. 
-    ECHO 설명 : 웹 프로세스가 관리자 권한이 부여된 계정으로 구동되고 있어 취약합니다. 
+    ECHO 설명 : 로컬 보안 정책 ^> 로컬 정책^> 사용자 권한에 "nobody" 계정이 누락되어 웹 프로세스가 관리자 권한이 부여된 계정으로 운영 중인 것으로 간주하여, 이를 취약으로 판단합니다.
     ECHO. 
     ECHO [보안 조치]
     ECHO. 
     ECHO ■ Windows NT, 2000, 2003 
     ECHO. 
     ECHO [Step 1] "시작> 제어판> 관리도구> 컴퓨터 관리> 로컬 사용자 및 그룹> 사용자 선택 "
-    ECHO [Step 2] "nobody 계정 추가 -> nobody 계정의 소속 그룹에 정해진 User가 있으면 제거 "
-    ECHO [Step 3] "시작> 제어판> 관리도구> 로컬 보안 정책> 로컬 정책> 사용자 권한 할당 선택, "서비스 로그온"에 "nobody" 계정 추가 "
+    ECHO [Step 2] "nobody 계정 추가 -> nobody 계정의 소속 그룹에 정해진 User가 있으면 제거" 
+    ECHO [Step 3] "시작> 제어판> 관리도구> 로컬 보안 정책> 로컬 정책> 사용자 권한 할당 선택", "서비스 로그온"에 "nobody" 계정 추가 
     ECHO [Step 4] "시작> 실행> SERVICES.MSC> IIS Admin Service> 속성> [로그온] 탭의 계정 지정에 nobody 계정 및 패스워드 입력 "
     ECHO [Step 5] "시작> 프로그램> 윈도우 탐색기> IIS 가 설치된 폴더 속성> [보안] 탭에서 nobody 계정을 추가하고 모든 권한 체크 "
     ECHO. 
     ECHO --------------------------------------------------------------------------------- 
     ECHO. 
-    
-) else (
-    ECHO --------------------------------------------------------------------------------- >> good.txt
-    ECHO. >> good.txt
-    ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 양호 ] >> good.txt
-    ECHO. >> good.txt
-    ECHO 설명 : 웹 프로세스가 웹 서비스 운영에 필요한 최소한 권한으로 설정되어 있어 양호합니다. >> good.txt
-    ECHO. >> good.txt
-    ECHO --------------------------------------------------------------------------------- >> good.txt
-    ECHO. >> good.txt    
 
+    goto end_27
+    
+)  
+
+icacls "C:\web" | findstr /C:"nobody" > nul
+
+if errorlevel 1 (
+    ECHO. >> bad.txt
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO. >> bad.txt
+    ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 취약 ] >> bad.txt
+    ECHO. >> bad.txt
+    ECHO 설명 : IIS 디렉토리에 "nobody" 계정이 누락되어 웹 프로세스가 관리자 권한이 부여된 계정으로 운영 중인 것으로 간주하여, 이를 취약으로 판단합니다. >> bad.txt
+    ECHO. >> bad.txt
+    ECHO [보안 조치] >> bad.txt
+    ECHO. >> bad.txt
+    ECHO ■ Windows NT, 2000, 2003 >> bad.txt
+    ECHO. >> bad.txt
+    ECHO [Step 1] "시작> 제어판> 관리도구> 컴퓨터 관리> 로컬 사용자 및 그룹> 사용자 선택" >> bad.txt
+    ECHO [Step 2] "nobody 계정 추가 -> nobody 계정의 소속 그룹에 정해진 User가 있으면 제거" >> bad.txt
+    ECHO [Step 3] "시작> 제어판> 관리도구> 로컬 보안 정책> 로컬 정책> 사용자 권한 할당 선택", "서비스 로그온"에 "nobody" 계정 추가 >> bad.txt
+    ECHO [Step 4] "시작> 실행> SERVICES.MSC> IIS Admin Service> 속성> [로그온] 탭의 계정 지정에 nobody 계정 및 패스워드 입력" >> bad.txt
+    ECHO [Step 5] "시작> 프로그램> 윈도우 탐색기> IIS 가 설치된 폴더 속성> [보안] 탭에서 nobody 계정을 추가하고 모든 권한 체크" >> bad.txt
+    ECHO. >> bad.txt
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO. >> bad.txt
+
+    ECHO. 
     ECHO --------------------------------------------------------------------------------- 
     ECHO. 
-    ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 양호 ] 
+    ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 취약 ] 
     ECHO. 
-    ECHO 설명 : 웹 프로세스가 웹 서비스 운영에 필요한 최소한 권한으로 설정되어 있어 양호합니다. 
+    ECHO 설명 : IIS 디렉토리에 "nobody" 계정이 누락되어 웹 프로세스가 관리자 권한이 부여된 계정으로 운영 중인 것으로 간주하여, 이를 취약으로 판단합니다. 
+    ECHO [보안 조치]
+    ECHO. 
+    ECHO ■ Windows NT, 2000, 2003 
+    ECHO. 
+    ECHO [Step 1] "시작> 제어판> 관리도구> 컴퓨터 관리> 로컬 사용자 및 그룹> 사용자 선택 "
+    ECHO [Step 2] "nobody 계정 추가 -> nobody 계정의 소속 그룹에 정해진 User가 있으면 제거 "
+    ECHO [Step 3] "시작> 제어판> 관리도구> 로컬 보안 정책> 로컬 정책> 사용자 권한 할당 선택", "서비스 로그온"에 "nobody" 계정 추가 
+    ECHO [Step 4] "시작> 실행> SERVICES.MSC> IIS Admin Service> 속성> [로그온] 탭의 계정 지정에 nobody 계정 및 패스워드 입력" 
+    ECHO [Step 5] "시작> 프로그램> 윈도우 탐색기> IIS 가 설치된 폴더 속성> [보안] 탭에서 nobody 계정을 추가하고 모든 권한 체크 "
     ECHO. 
     ECHO --------------------------------------------------------------------------------- 
-    ECHO.     
-    )
+    ECHO. 
+
+    goto end_27
+)
+
+
+ECHO --------------------------------------------------------------------------------- >> good.txt
+ECHO. >> good.txt
+ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 양호 ] >> good.txt
+ECHO. >> good.txt
+ECHO 설명 : 웹 프로세스가 웹 서비스 운영에 필요한 최소한 권한^(nobody^)으로 설정되어 있어 양호합니다. >> good.txt
+ECHO. >> good.txt
+ECHO --------------------------------------------------------------------------------- >> good.txt
+ECHO. >> good.txt    
+
+ECHO --------------------------------------------------------------------------------- 
+ECHO. 
+ECHO [ W-27 IIS 웹 프로세스 권한 제한 - 양호 ] 
+ECHO. 
+ECHO 설명 : 웹 프로세스가 웹 서비스 운영에 필요한 최소한 권한^(nobody^)으로 설정되어 있어 양호합니다. 
+ECHO. 
+ECHO --------------------------------------------------------------------------------- 
+ECHO.    
+
+:end_27
 
 
 pause
@@ -1911,65 +1957,43 @@ REM -------------------------------------------10. W-28. IIS 링크 사용금지
 :ACCOUNT_W-28
 ECHO [W28] IIS 링크 사용금지.
 
-%SystemRoot%\System32\inetsrv\appcmd list config "Default Web Site" /section:directoryBrowse | findstr "false"
+ECHO --------------------------------------------------------------------------------- >> check.txt
+ECHO. >> check.txt
+ECHO [ W - 28 IIS 링크 사용 금지 - 확인 필요 ] >> check.txt
+ECHO. >> check.txt
+ECHO 설명 : 심볼릭 링크, aliases, 바로가기 등의 파일이등록된 웹 사이트의 홈 디렉토리에 없는지 수동 점검해야 합니다.  >> check.txt
+ECHO. >> check.txt
+ECHO [보안 조치] >> check.txt
+ECHO 등록된 웹 사이트의 홈 디렉토리에 있는 심볼릭 링크, aliases, 바로가기 파일 삭제 >> check.txt
+ECHO . >> check.txt
+ECHO ■ Windows 2000, 2003 >> check.txt
+ECHO [Step 1] 인터넷 정보 서비스 관리 ▶ 해당 웹사이트 ▶ 속성 ▶ [홈 디렉토리] 탭 선택 ▶ [로컬 경로]에서 홈 디렉토리 위치 확인 >> check.txt
+ECHO [Step 2] 로컬 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제 >> check.txt 
+ECHO. >> check.txt
+ECHO ■ Windows 2008, 2012, 2016, 2019 >> check.txt
+ECHO [Step 1] 제어판 ▶ 관리도구 ▶ 인터넷 정보 서비스 관리자 ▶ 해당 웹사이트 ▶ 기본 설정 ▶ [실제 경로]에서 홈 디렉토리 위치 확인 >> check.txt
+ECHO [Step 2] 실제 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제 >> check.txt
+ECHO --------------------------------------------------------------------------------- >> check.txt
+ECHO . >> check.txt
 
-if %errorlevel% equ 0 (
-    ECHO --------------------------------------------------------------------------------- >> bad.txt
-    ECHO. >> bad.txt
-    ECHO [ W - 28 IIS 링크 사용 금지 - 취약 ] >> bad.txt
-    ECHO. >> bad.txt
-    ECHO 설명 : 심볼릭 링크, aliases, 바로가기 등의 사용을 허용하므로 취약합니다. >> bad.txt
-    ECHO. >> bad.txt
-    ECHO [보안 조치] >> bad.txt
-    ECHO 등록된 웹 사이트의 홈 디렉토리에 있는 심볼릭 링크, aliases, 바로가기 파일 삭제 >> bad.txt
-    ECHO . >> bad.txt
-    ECHO ■ Windows 2000, 2003 >> bad.txt
-    ECHO [Step 1] 인터넷 정보 서비스 관리 ▶ 해당 웹사이트 ▶ 속성 ▶ [홈 디렉토리] 탭 선택 ▶ [로컬 경로]에서 홈 디렉토리 위치 확인 >> bad.txt
-    ECHO [Step 2] 로컬 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제 >> bad.txt 
-    ECHO. >> bad.txt
-    ECHO ■ Windows 2008, 2012, 2016, 2019 >> bad.txt 
-    ECHO [Step 1] 제어판 ▶ 관리도구 ▶ 인터넷 정보 서비스 관리자 ▶ 해당 웹사이트 ▶ 기본 설정 ▶ [실제 경로]에서 홈 디렉토리 위치 확인 >> bad.txt
-    ECHO [Step 2] 실제 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제 >> bad.txt
-    ECHO. >> bad.txt
-    ECHO --------------------------------------------------------------------------------- >> bad.txt
-    ECHO. >> bad.txt
-
-    ECHO --------------------------------------------------------------------------------- 
-    ECHO. 
-    ECHO [ W - 28 IIS 링크 사용 금지 - 취약 ]
-    ECHO. 
-    ECHO 설명 : 심볼릭 링크, aliases, 바로가기 등의 사용을 허용하므로 취약합니다. 
-    ECHO. 
-    ECHO [보안 조치] 
-    ECHO 등록된 웹 사이트의 홈 디렉토리에 있는 심볼릭 링크, aliases, 바로가기 파일 삭제 
-    ECHO . 
-    ECHO ■ Windows 2000, 2003
-    ECHO [Step 1] 인터넷 정보 서비스 관리 ▶ 해당 웹사이트 ▶ 속성 ▶ [홈 디렉토리] 탭 선택 ▶ [로컬 경로]에서 홈 디렉토리 위치 확인 
-    ECHO [Step 2] 로컬 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제  
-    ECHO. 
-    ECHO ■ Windows 2008, 2012, 2016, 2019
-    ECHO [Step 1] 제어판 ▶ 관리도구 ▶ 인터넷 정보 서비스 관리자 ▶ 해당 웹사이트 ▶ 기본 설정 ▶ [실제 경로]에서 홈 디렉토리 위치 확인 
-    ECHO [Step 2] 실제 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제 
-    ECHO. 
-    ECHO --------------------------------------------------------------------------------- 
-    ECHO. 
-) else (
-    ECHO --------------------------------------------------------------------------------- >> good.txt
-    ECHO. >> good.txt
-    ECHO [ W - 28 IIS 링크 사용 금지 - 양호 ] >> good.txt
-    ECHO. >> good.txt
-    ECHO 설명 : 심볼릭 링크, aliases, 바로가기 등의 사용을 허용하지 않으므로 양호합니다. >> good.txt
-    ECHO. >> good.txt
-    ECHO --------------------------------------------------------------------------------- >> good.txt
-
-    ECHO --------------------------------------------------------------------------------- 
-    ECHO. 
-    ECHO [ W - 28 IIS 링크 사용 금지 - 양호 ] 
-    ECHO. 
-    ECHO 설명 : 심볼릭 링크, aliases, 바로가기 등의 사용을 허용하지 않으므로 양호합니다. 
-    ECHO. 
-    ECHO ---------------------------------------------------------------------------------
-)
+ECHO --------------------------------------------------------------------------------- 
+ECHO. 
+ECHO [ W - 28 IIS 링크 사용 금지 - 확인 필요 ]
+ECHO. 
+ECHO 설명 : 심볼릭 링크, aliases, 바로가기 등의 파일이등록된 웹 사이트의 홈 디렉토리에 없는지 수동 점검해야 합니다.  
+ECHO. 
+ECHO [보안 조치] 
+ECHO 등록된 웹 사이트의 홈 디렉토리에 있는 심볼릭 링크, aliases, 바로가기 파일 삭제 
+ECHO . 
+ECHO ■ Windows 2000, 2003
+ECHO [Step 1] 인터넷 정보 서비스 관리 ▶ 해당 웹사이트 ▶ 속성 ▶ [홈 디렉토리] 탭 선택 ▶ [로컬 경로]에서 홈 디렉토리 위치 확인 
+ECHO [Step 2] 로컬 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제  
+ECHO. 
+ECHO ■ Windows 2008, 2012, 2016, 2019
+ECHO [Step 1] 제어판 ▶ 관리도구 ▶ 인터넷 정보 서비스 관리자 ▶ 해당 웹사이트 ▶ 기본 설정 ▶ [실제 경로]에서 홈 디렉토리 위치 확인 
+ECHO [Step 2] 실제 경로에 입력된 홈 디렉토리로 이동하여 바로가기 파일 삭제 
+ECHO --------------------------------------------------------------------------------- 
+ECHO .
 
 pause
 goto SERVICE
@@ -3210,14 +3234,14 @@ if "%shutdownValue%"=="0" (
     echo -------------------------------------------------------------------------------- >> good.txt
     echo [ W = 49 로그온 하지 않고 시스템 종료 허용 해제 - 양호 ] >> good.txt
     echo. >> good.txt
-    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용 안 함"으로 설정되어 있어 양호하다. >> good.txt
+    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용 안 함"으로 설정되어 있어 양호하다. - 수동점검 요망 >> good.txt
     echo. >> good.txt
     echo -------------------------------------------------------------------------------- >> good.txt
 
     echo --------------------------------------------------------------------------------
     echo [ W = 49 로그온 하지 않고 시스템 종료 허용 해제 - 양호 ]
     echo. 
-    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용 안 함"으로 설정되어 있어 양호하다. 
+    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용 안 함"으로 설정되어 있어 양호하다. - 수동점검 요망
     echo.
     echo -------------------------------------------------------------------------------- 
 ) else (
