@@ -2022,97 +2022,50 @@ if %errorlevel% equ 0 (
     ECHO. 
 pause
 goto SERVICE
-
+%windir%\System32\inetsrv\appcmd list config "web" -section:system.webServer/asp | findstr "limits" | findstr "bufferingLimit=\"4194304\"" | findstr "maxRequestEntityAllowed=\"200000\"" > nul
+if %errorlevel%==0 (
+    ECHO -------------------------------------------------------------------
+    ECHO [ W - 29 파일 업로드 및 다운로드 제한 - 양호 ]
+    ECHO.
+    ECHO 설명 : 웹 프로세스의 서버 자원 관리를 위해 업로드 및 다운로드 용량을 제한하므로 양호합니다.
+    ECHO.
+    ECHO ------------------------------------------------------------------- >> good.txt
+    ECHO [ W - 29 파일 업로드 및 다운로드 제한 - 양호 ] >> good.txt
+    ECHO. >> good.txt
+    ECHO 설명 : 웹 프로세스의 서버 자원 관리를 위해 업로드 및 다운로드 용량을 제한하므로 양호합니다. >> good.txt
+    ECHO. >> good.txt
 ) else (
-    :badw29
-    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO [ W - 29 파일 업로드 및 다운로드 제한 - 취약 ]
+    ECHO.
+    ECHO 설명 : 웹 프로세스의 서버 자원을 관리하지 않으므로 취약합니다. - 업로드 및 다운로드 용량 미 제한
+    ECHO.
+    ECHO [보안 조치] 
+    ECHO.
+    ECHO ■ Windows 2008, 2012, 2016, 2019
+    ECHO [Step 1] 시작 ▶ 실행 ▶ INETMGR ▶ 웹 사이트 ▶ 해당 웹사이트 ▶ ASP ▶ 제한 속성 확인
+    ECHO [Step 2] Default 값 설정
+    ECHO 1 최대 요청 엔터티 본문 제한 maxRequestEntityAllowed - 파일 업로드 용량 : Default 200000 byte
+    ECHO 2 응답 버퍼링 제한 bufferingLimit - 파일 다운로드 용량 : Default 4194304 byte
+    ECHO. 
+    ECHO ------------------------------------------------------------------- >> bad.txt
     ECHO [ W - 29 파일 업로드 및 다운로드 제한 - 취약 ]>> bad.txt
     ECHO. >> bad.txt
     ECHO 설명 : 웹 프로세스의 서버 자원을 관리하지 않으므로 취약합니다. - 업로드 및 다운로드 용량 미 제한 >> bad.txt
     ECHO. >> bad.txt
     ECHO [보안 조치] >> bad.txt
-    ECHO ■ Windows NT, 2000, 2003 >> bad.txt
-    ECHO [Step 1] 시작 ▶ 실행 ▶ SEVICES.MSC ▶ IISADMIN ▶ 속성 ▶ [일반] 탭에서 서비스 중지 >> bad.txt
-    ECHO [Step 2] %systemroot%\system32\inetsrv\MetaBase.xml 파일을 찾아 편집기로 OPEN >> bad.txt
-    ECHO [Step 3] AspMaxRequestEntityAllowed 값을 찾아 파일 업로드 용량을 최소 범위로 제한 >> bad.txt
-    ECHO [Step 4] AspBufferingLimit 값을 찾아 파일 다운로드 용량을 최소 범위로 제한 >> bad.txt
-    ECHO [Step 5] 시작 ▶ 실행 ▶ SERVICES.MSC ▶ IISADMIN ▶ 속성 ▶ [일반] 탭에서 서비스 시작 >> bad.txt
     ECHO. >> bad.txt
-    ECHO ■ Windows 2008, 2012, 2016, 2019 >> bad.txt
-    ECHO [Step 1] 등록된 웹 사이트의 루트 디렉터리 디렉토리에 있는 web.config 파일 내 아래 항목 추가 - web.config 파일이 없으면 사이트 홈 디렉토리에 새로 생성 >> bad.txt
-    ECHO [Step 1 - code] >> bad.txt
-    ECHO ^<configuration^> >> bad.txt
-    ECHO    ^<system.webServer^> >> bad.txt
-    ECHO        ^<security^> >> bad.txt
-    ECHO            ^<requestFiltering^> >> bad.txt
-    ECHO                ^<requestLimits maxAllowedContentLength="콘텐츠용량" /^> >> bad.txt
-    ECHO            ^</requestFiltering^> >> bad.txt
-    ECHO        ^</security^> >> bad.txt
-    ECHO    ^</system.webServer^> >> bad.txt
-    ECHO ^</configuration^> >> bad.txt
+    ECHO [Step 1] 시작 ▶ 실행 ▶ INETMGR ▶ 웹 사이트 ▶ 해당 웹사이트 ▶ ASP ▶ 제한 속성 확인
+    ECHO [Step 2] Default 값 설정 >> bad.txt
+    ECHO 1 최대 요청 엔터티 본문 제한 maxRequestEntityAllowed - 파일 업로드 용량 : Default 200000 byte >> bad.txt
+    ECHO 2 응답 버퍼링 제한 bufferingLimit - 파일 다운로드 용량 : Default 4194304 byte >> bad.txt
     ECHO. >> bad.txt
-    ECHO [Step 2] %systemroot%\system32\inetsrv\config\applicationHost.config 파일 내 아래 항목 추가 >> bad.txt
-    ECHO [Step 2 - code] >> bad.txt
-    ECHO ^<system.webServer^> >> bad.txt
-    ECHO    ^<asp^> >> bad.txt
-    ECHO        ^<limits bufferingLimit="파일다운로드용량" maxRequestEntityAllowed="파일업로드용량"/^> >> bad.txt
-    ECHO    ^</asp^> >> bad.txt
-    ECHO ^</system.webServer^> >> bad.txt
-    ECHO. >> bad.txt
-    ECHO [Default 설정 값]>> bad.txt
-    ECHO [1] maxAllowedContentLength - 콘텐츠 용량 : Default 30MB >> bad.txt
-    ECHO [2] maxRequestEntityAllowed - 파일 업로드 용량 : Default 200000 byte >> bad.txt
-    ECHO [3] bufferingLimit - 파일 다운로드 용량 : Default 4MB >> bad.txt
-    ECHO --------------------------------------------------------------------------------- >> bad.txt
-    ECHO. >> bad.txt
-
-    ECHO --------------------------------------------------------------------------------- 
-    ECHO [ W - 29 파일 업로드 및 다운로드 제한 - 취약 ]
-    ECHO.
-    ECHO 설명 : 웹 프로세스의 서버 자원을 관리하지 않으므로 취약합니다. - 업로드 및 다운로드 용량 미 제한
-    ECHO. 
-    ECHO [보안 조치] 
-    ECHO ■ Windows NT, 2000, 2003 
-    ECHO [Step 1] 시작 ▶ 실행 ▶ SEVICES.MSC ▶ IISADMIN ▶ 속성 ▶ [일반] 탭에서 서비스 중지 
-    ECHO [Step 2] %systemroot%\system32\inetsrv\MetaBase.xml 파일을 찾아 편집기로 OPEN 
-    ECHO [Step 3] AspMaxRequestEntityAllowed 값을 찾아 파일 업로드 용량을 최소 범위로 제한 
-    ECHO [Step 4] AspBufferingLimit 값을 찾아 파일 다운로드 용량을 최소 범위로 제한 
-    ECHO [Step 5] 시작 ▶ 실행 ▶ SERVICES.MSC ▶ IISADMIN ▶ 속성 ▶ [일반] 탭에서 서비스 시작 
-    ECHO. 
-    ECHO ■ Windows 2008, 2012, 2016, 2019 
-    ECHO [Step 1] 등록된 웹 사이트의 루트 디렉터리 디렉토리에 있는 web.config 파일 내 아래 항목 추가 - web.config 파일이 없으면 사이트 홈 디렉토리에 새로 생성 
-    ECHO [Step 1 - code] 
-    ECHO ^<configuration^> 
-    ECHO    ^<system.webServer^> 
-    ECHO        ^<security^> 
-    ECHO            ^<requestFiltering^> 
-    ECHO                ^<requestLimits maxAllowedContentLength="콘텐츠용량" /^> 
-    ECHO            ^</requestFiltering^> 
-    ECHO        ^</security^> 
-    ECHO    ^</system.webServer^> 
-    ECHO ^</configuration^> 
-    ECHO. 
-    ECHO [Step 2] %systemroot%\system32\inetsrv\config\applicationHost.config 파일 내 아래 항목 추가 
-    ECHO [Step 2 - code] 
-    ECHO ^<system.webServer^> 
-    ECHO    ^<asp^> 
-    ECHO        ^<limits bufferingLimit="파일다운로드용량" maxRequestEntityAllowed="파일업로드용량"/^> 
-    ECHO    ^</asp^> 
-    ECHO ^</system.webServer^> 
-    ECHO. 
-    ECHO [Default 설정 값]
-    ECHO [1] maxAllowedContentLength - 콘텐츠 용량 : Default 30MB 
-    ECHO [2] maxRequestEntityAllowed - 파일 업로드 용량 : Default 200000 byte 
-    ECHO [3] bufferingLimit - 파일 다운로드 용량 : Default 4MB 
-    ECHO --------------------------------------------------------------------------------- 
-    ECHO. 
-
+)
 
 pause
 goto SERVICE
 
 	
-)
+
 
 @echo off
 
@@ -2353,64 +2306,52 @@ REM -------------------------------------------15. W-33. IIS 미사용 스크립
 :ACCOUNT_W-33
 ECHO [W33] IIS 미사용 스크립트 매핑 제거.
 
-echo.                                                       
-secedit /EXPORT /CFG log.txt > NUL
-type log.txt | Find /I ".htr" 
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".idc"
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".stm"
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".shtm"
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".shtml"
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".printer"
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".htw"
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".ida"
-if not errorlevel 1 GOTO weak
-type log.txt | Find /I ".idq"
-if not errorlevel 1 GOTO weak
-if errorlevel 1 GOTO good
+setlocal enabledelayedexpansion
+set vuln_mapping=.htr .idc .stm .shtml .printer .htw .ida .idq
+set vuln_found=0
 
-:weak
-ECHO --------------------------------------------------------------------------------- >> bad.txt
-ECHO [ W-33 : IIS 미사용 스크립트 매핑 제거 - 취약 ] >> bad.txt
-ECHO 설명 : 취약한 매핑이 확인되었으므로 취약하다. >> bad.txt
-ECHO [보안 조치] >> bad.txt
-ECHO Step 1 : "시작 > 실행 > INETMGR > 웹 사이트 > 해당 웹사이트 > 처리기 매핑 선택" >> bad.txt
-ECHO Step 2 : 취약한 매핑 제거 >> bad.txt
-ECHO --------------------------------------------------------------------------------- >> bad.txt
-ECHO. >> bad.txt
-ECHO. >> bad.txt
-ECHO ---------------------------------------------------------------------------------
-ECHO [ W-33 : IIS 미사용 스크립트 매핑 제거 - 취약 ]
-ECHO 설명 : 취약한 매핑이 확인되었으므로 취약하다.
-ECHO [보안 조치]
-ECHO Step 1 : "시작 > 실행 > INETMGR > 웹 사이트 > 해당 웹사이트 > 처리기 매핑 선택"
-ECHO Step 2 : 취약한 매핑 제거
-ECHO ---------------------------------------------------------------------------------
-ECHO.
-GOTO end
+for %%i in (%vuln_mapping%) do (
+    %windir%\system32\inetsrv\appcmd list config "web" -section:system.webServer/handlers | findstr /C:"%%i" > nul
+    if !errorlevel! == 0 (
+        echo "%%i이 존재합니다." >> bad.txt
+	echo "%%i이 존재합니다."
+        set vuln_found=1
+    )
+)
 
-:good
-ECHO --------------------------------------------------------------------------------- >> good.txt
-ECHO [  W-33 : IIS 미사용 스크립트 매핑 제거 - 양호 ] >> good.txt
-ECHO. >> good.txt
-ECHO 설명: 취약한 매핑이 발견되지 않았으므로 양호하다 >> good.txt
-ECHO --------------------------------------------------------------------------------- >> good.txt
-ECHO. >> good.txt
-ECHO. >> good.txt
-ECHO ---------------------------------------------------------------------------------
-ECHO [  W-33 : IIS 미사용 스크립트 매핑 제거 - 양호 ]
-ECHO.
-ECHO 설명: 취약한 매핑이 발견되지 않았으므로 양호하다
-ECHO ---------------------------------------------------------------------------------
-ECHO.
-ECHO.
-:end
+if !vuln_found! equ 1 (
+	ECHO ---------------------------------------------------------------------------------
+	ECHO [ W-33 : IIS 미사용 스크립트 매핑 제거 - 취약 ]
+	ECHO 설명 : 취약한 매핑이 확인되었으므로 취약하다.
+	ECHO [보안 조치]
+	ECHO.
+	ECHO Step 1 : 시작 ^> 실행 ^> INETMGR ^> 웹 사이트 ^> 해당 웹사이트 ^> 처리기 매핑 선택
+	ECHO Step 2 : 취약한 매핑 제거
+	ECHO ---------------------------------------------------------------------------------
+	ECHO.
+	ECHO --------------------------------------------------------------------------------- >> bad.txt
+	ECHO [ W-33 : IIS 미사용 스크립트 매핑 제거 - 취약 ] >> bad.txt
+	ECHO 설명 : 취약한 매핑이 확인되었으므로 취약하다. >> bad.txt
+	ECHO [보안 조치] >> bad.txt
+	ECHO. >> bad.txt
+	ECHO Step 1 : 시작 ^> 실행 ^> INETMGR ^> 웹 사이트 ^> 해당 웹사이트 ^> 처리기 매핑 선택 >> bad.txt
+	ECHO Step 2 : 취약한 매핑 제거 >> bad.txt
+	ECHO --------------------------------------------------------------------------------- >> bad.txt
+	ECHO. >> bad.txt
+) else (
+	ECHO ---------------------------------------------------------------------------------
+	ECHO [  W-33 : IIS 미사용 스크립트 매핑 제거 - 양호 ]
+	ECHO.
+	ECHO 설명: 취약한 매핑이 발견되지 않았으므로 양호하다
+	ECHO ---------------------------------------------------------------------------------
+	ECHO.
+	ECHO --------------------------------------------------------------------------------- >> good.txt
+	ECHO [  W-33 : IIS 미사용 스크립트 매핑 제거 - 양호 ] >> good.txt
+	ECHO. >> good.txt
+	ECHO 설명: 취약한 매핑이 발견되지 않았으므로 양호하다 >> good.txt
+	ECHO --------------------------------------------------------------------------------- >> good.txt
+	ECHO. >> good.txt
+)
 
 pause
 goto SERVICE
@@ -3080,6 +3021,34 @@ REM -------------------------------------------1. W-44. 로그의 정기적 검�
 :ACCOUNT_W-44
 ECHO [W44] 로그의 정기적 검토 및 보고.
 
+ECHO --------------------------------------------------------------------------------- >> check.txt
+ECHO [ W-44 : 로그의 정기적 검토 및 보고 - 확인 필요 ] >> check.txt
+ECHO. 
+ECHO 설명 : 접속기록 등의 보안 로그, 응용 프로그램 및 시스템 로그 기록에 대해 정기 적으로 검토, 분석, 리포트 작성 및 보고 등의 조치가 이루어지는지 확인이 필요합니다 >> check.txt
+ECHO. >> check.txt
+ECHO [보안 조치] >> check.txt
+ECHO. >> check.txt
+ECHO Step 1^) 로그 기록에 대한 정기적 검토 및 분석 실시 >> check.txt
+ECHO a. 시작> 제어판> 관리 도구> 이벤트 뷰어 >> check.txt
+ECHO b. 응용 프로그램 로그, 보안 로그, 시스템 로그 분석 >> check.txt
+ECHO Step 2^) 로그 분석 결과에 대한 일일·월간 보고서 작성 및 보고 >> check.txt
+ECHO --------------------------------------------------------------------------------- >> check.txt
+ECHO. >> check.txt
+ECHO. >> check.txt
+ECHO ---------------------------------------------------------------------------------
+ECHO [ W-44 : 로그의 정기적 검토 및 보고 - 확인 필요 ] 
+ECHO .
+ECHO 설명 : 접속기록 등의 보안 로그, 응용 프로그램 및 시스템 로그 기록에 대해 정기 적으로 검토, 분석, 리포트 작성 및 보고 등의 조치가 이루어지는지 확인이 필요합니다
+ECHO.
+ECHO [보안 조치]
+ECHO.
+ECHO Step 1^) 로그 기록에 대한 정기적 검토 및 분석 실시 
+ECHO a. 시작 ^> 제어판 ^> 관리 도구 ^> 이벤트 뷰어
+ECHO b. 응용 프로그램 로그, 보안 로그, 시스템 로그 분석
+ECHO Step 2^) 로그 분석 결과에 대한 일일·월간 보고서 작성 및 보고 
+ECHO ---------------------------------------------------------------------------------
+ECHO.
+
 pause
 goto LOG
 
@@ -3135,6 +3104,53 @@ REM -------------------------------------------1. W-46. 백신 프로그램 설�
 :ACCOUNT_W-46
 ECHO [W46] 백신 프로그램 설치.
 
+ECHO --------------------------------------------------------------------------------- >> check.txt
+ECHO [ W-46 : 백신 프로그램 확인 - 확인 필요 ] >> check.txt
+ECHO. >> check.txt
+ECHO [서비스 목록 확인] >> check.txt
+net start | find /v "다음과 같은 Windows 서비스가 시작되었습니다." | find /v "명령을 잘 실행했습니다." >> check.txt
+ECHO. >> check.txt
+ECHO [실행 중인 프로그램 목록 확인] >> check.txt
+tasklist >> check.txt
+ECHO.
+ECHO.
+ECHO 설명 : 바이러스 백신 프로그램이 설치되어 있는지 수동 점검이 필요합니다. >> check.txt
+ECHO. >> check.txt
+ECHO [보안 조치] >> check.txt
+ECHO. >> check.txt
+ECHO 나열되지 않은 백신에 대해서도 인지도, 효과성 등을 검토하여 설치할 수 있음 >> check.txt
+ECHO * 안철수 연구소: http://www.ahnlab.com >> check.txt
+ECHO * 하우리: http://www.hauri.co.kr >> check.txt
+ECHO * 노턴라이프락(구 시만텍): https://kr.norton.com/\ >> check.txt
+ECHO * 한국트렌드마이크로: http://www.trendmicro.co.kr >> check.txt
+ECHO * 알약: https://www.estsecurity.com/  >> check.txt
+ECHO --------------------------------------------------------------------------------- >> check.txt
+ECHO. >> check.txt
+ECHO. >> check.txt
+ECHO --------------------------------------------------------------------------------- 
+ECHO [ W-46 : 백신 프로그램 확인 - 확인 필요 ] 
+ECHO. 
+ECHO [서비스 목록 확인]
+net start | find /v "다음과 같은 Windows 서비스가 시작되었습니다." | find /v "명령을 잘 실행했습니다."
+ECHO.
+ECHO [실행 중인 프로그램 목록 확인]
+tasklist
+ECHO.
+ECHO.
+ECHO 설명 : 바이러스 백신 프로그램이 설치되어 있는지 수동 점검이 필요합니다.
+ECHO.
+ECHO [보안 조치] 
+ECHO.
+ECHO 나열되지 않은 백신에 대해서도 인지도, 효과성 등을 검토하여 설치할 수 있음
+ECHO * 안철수 연구소: http://www.ahnlab.com
+ECHO * 하우리: http://www.hauri.co.kr
+ECHO * 노턴라이프락(구 시만텍): https://kr.norton.com/\ 
+ECHO * 한국트렌드마이크로: http://www.trendmicro.co.kr 
+ECHO * 알약: https://www.estsecurity.com/ 
+ECHO --------------------------------------------------------------------------------- 
+ECHO.
+ECHO.
+
 pause
 goto SECURITY
 
@@ -3142,12 +3158,54 @@ REM -------------------------------------------2. W-47. SAM 파일 접근 통제
 :ACCOUNT_W-47
 ECHO [W47] SAM 파일 접근 통제 설정.
 
+cacls %systemroot%\system32\config\SAM | findstr /i "SAM" | findstr /i "NT AUTHORITY\SYSTEM"
+
+if not errorlevel 1 (
+    ECHO --------------------------------------------------------------------------------- >> good.txt
+    ECHO [ W-47 : SAM 파일 접근 통제 설정 - 양호 ] >> good.txt
+    ECHO. >> good.txt
+    ECHO 설명: SAM 파일 접근권한에 Administrator, System 그룹만 모든 권한으로 설정되어 있으므로 양호하다. >> good.txt
+    ECHO --------------------------------------------------------------------------------- >> good.txt
+    ECHO. >> good.txt
+    ECHO. >> good.txt
+    ECHO ---------------------------------------------------------------------------------
+    ECHO [ W-47 : SAM 파일 접근 통제 설정 - 양호 ]
+    ECHO.
+    ECHO 설명: SAM 파일 접근권한에 Administrator, System 그룹만 모든 권한으로 설정되어 있으므로 양호하다.
+    ECHO ---------------------------------------------------------------------------------
+    ECHO.
+    ECHO.
+)
+
+if errorlevel 1 (
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO [ W-47 : SAM 파일 접근 통제 설정 - 취약 ] >> bad.txt
+    ECHO 설명 : SAM 파일 접근권한에 Administrator, System 그룹 외 다른 그룹에 권한 이 설정되어 있으므로 취약하다. >> bad.txt
+    ECHO [보안 조치] >> bad.txt
+    ECHO Step 1^) %systemroot%\system32\config\SAM ^> 속성^> 보안 >> bad.txt
+    ECHO Step 2^) Administrator, System 그룹 외 다른 사용자 및 그룹 권한 제거 >> bad.txt
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO. >> bad.txt
+    ECHO. >> bad.txt
+    ECHO ---------------------------------------------------------------------------------
+    ECHO [ W-37 : W-47 : SAM 파일 접근 통제 설정 - 취약 ]
+    ECHO 설명 : SAM 파일 접근권한에 Administrator, System 그룹 외 다른 그룹에 권한이 설정되어 있으므로 취약하다.
+    ECHO [보안 조치]
+    ECHO Step 1^) %systemroot%\system32\config\SAM ^> 속성^> 보안
+    ECHO Step 2^) Administrator, System 그룹 외 다른 사용자 및 그룹 권한 제거
+    ECHO ---------------------------------------------------------------------------------
+    ECHO.
+    ECHO.
+)
+
 pause
 goto SECURITY
 
 REM -------------------------------------------3. W-48. 화면보호기 설정.
 :ACCOUNT_W-48
 ECHO [W48] 화면보호기 설정.
+
+setlocal enabledelayedexpansion
 
 set regPath=HKEY_CURRENT_USER\Control Panel\Desktop
 set regValue1=ScreenSaveActive
@@ -3166,53 +3224,67 @@ for /f "tokens=3" %%c in ('reg query "%regPath%" /v "%regValue3%" ^| findstr "%r
     set secure=%%c
 )
 
-if "%active%"=="1" if %timeout% LEQ 600 if "%secure%"=="1" (
-    echo -------------------------------------------------------------------------------- >> good.txt
-    echo [ W = 48 화면보호기 설정 - 양호 ] >> good.txt
-    echo. >> good.txt
-    echo 설명 : 화면 보호기를 설정하고 대기 시간이 10분 이하의 값으로 설정되어 있으며, 화면 보호기 해제를 위한 암호를 사용하므로 양호하다. >> good.txt
-    echo. >> good.txt
-    echo -------------------------------------------------------------------------------- >> good.txt
+reg query "%regPath%" /v "%regValue1%" | findstr "%regValue1%" >NUL
+if errorlevel 1 goto badw48
 
-    echo -------------------------------------------------------------------------------- 
-    echo [ W = 48 화면보호기 설정 - 양호 ]
-    echo.
-    echo 설명 : 화면 보호기를 설정하고 대기 시간이 10분 이하의 값으로 설정되어 있으며, 화면 보호기 해제를 위한 암호를 사용하므로 양호하다.
-    echo.
-    echo -------------------------------------------------------------------------------- 
+if "%active%"=="1" (
+    if !timeout! LEQ 600 (
+        if "%secure%"=="1" (
+            echo -------------------------------------------------------------------------------- >> good.txt
+            echo [ W - 48 화면보호기 설정 - 양호 ] >> good.txt
+            echo. >> good.txt
+            echo 설명 : 화면 보호기를 설정하고 대기 시간이 10분 이하의 값으로 설정되어 있으며, 화면 보호기 해제를 위한 암호를 사용하므로 양호하다. >> good.txt
+            echo. >> good.txt
+            echo ※ 화면 보호기의 유무인 HKEY_CURRENT_USER\Control Panel\Deskto\ScreenSaveActive 의 레지스트리 값은 '1'로 설정되어 있으나 제어판 ^> 화면보호기 설정에는 반영되어 있지 않을 수 있으므로 확인 요망 >> good.txt
+            echo. >> good.txt
+            echo -------------------------------------------------------------------------------- 
+            echo [ W - 48 화면보호기 설정 - 양호 ]
+            echo.
+            echo 설명 : 화면 보호기를 설정하고 대기 시간이 10분 이하의 값으로 설정되어 있으며, 화면 보호기 해제를 위한 암호를 사용하므로 양호하다.
+            echo.
+            echo ※ 화면 보호기의 유무인 HKEY_CURRENT_USER\Control Panel\Deskto\ScreenSaveActive 의 레지스트리 값은 '1'로 설정되어 있으나 제어판 ^> 화면보호기 설정에는 반영되어 있지 않을 수 있으므로 확인 요망            
+            echo. 
+            goto end48
+        ) else ( 
+            goto badw48 
+        )
+    ) else ( 
+        goto badw48 
+    )
 ) else (
+    :badw48
     echo ---------------------------------------------------------------------------------- >> bad.txt
-    echo [ W = 48 화면보호기 설정 - 취약 ] >> bad.txt
+    echo [ W - 48 화면보호기 설정 - 취약 ] >> bad.txt
     echo. >> bad.txt
     echo 설명 : 화면 보호기가 설정되지 않았거나 암호를 사용하지 않은 경우 또는, 화면 보호기 대기 시간이 10분을 초과한 값으로 설정되어 있으므로 취약하다. >> bad.txt
     echo. >> bad.txt
     echo [보안 조치] >> bad.txt
     echo ■ Windows NT, 2000 >> bad.txt
-    echo [Step 1] 바탕화면 ▶ 등록 정보 ▶ 화면 보호기 ▶ "암호 사용" 체그, 대기 시간 "10분" 설정 >> bad.txt
+    echo [Step 1] 바탕화면 ▶ 등록 정보 ▶ 화면 보호기 ▶ "암호 사용" 체크, 대기 시간 "10분" 설정 >> bad.txt
     echo ■ Windows 2003 >> bad.txt
     echo [Step 1] 바탕화면 ▶ 마우스 우클릭 ▶ 속성 ▶ 디스플레이 등록 정보 ▶ [화면 보호기] ▶ "다시 시작 할 때 암호로 보호" 체크 "대기 시간" 10분 설정 >> bad.txt
     echo ■ Windows 2008, 2012 >> bad.txt
     echo [Step 1] 제어판 ▶ 디스플레이 ▶ 화면보호기 변경 ▶ "다시 시작 할 때 로그온 화면 표시" 체크, "대기 시간" 10분 설정 >> bad.txt
     echo ■ Windows 2016, 2019 >> bad.txt
     echo [Step 1] 바탕화면 ▶ 마우스 우클릭 ▶개인 설정 ▶ 잠금 화면 ▶ 화면 보호기 설정 ▶ "다시 시작 할 때 로그온 화면 표시" 체크, "대기 시간" 10분 설정 >> bad.txt
-    echo ---------------------------------------------------------------------------------- >> bad.txt
-
     echo ----------------------------------------------------------------------------------
-    echo [ W = 48 화면보호기 설정 - 취약 ]
+    echo [ W - 48 화면보호기 설정 - 취약 ]
     echo.
     echo 설명 : 화면 보호기가 설정되지 않았거나 암호를 사용하지 않은 경우 또는, 화면 보호기 대기 시간이 10분을 초과한 값으로 설정되어 있으므로 취약하다.
     echo.
     echo [보안 조치]
     echo ■ Windows NT, 2000
-    echo [Step 1] 바탕화면 ▶ 등록 정보 ▶ 화면 보호기 ▶ "암호 사용" 체그, 대기 시간 "10분" 설정
+    echo [Step 1] 바탕화면 ▶ 등록 정보 ▶ 화면 보호기 ▶ "암호 사용" 체크, 대기 시간 "10분" 설정
     echo ■ Windows 2003
     echo [Step 1] 바탕화면 ▶ 마우스 우클릭 ▶ 속성 ▶ 디스플레이 등록 정보 ▶ [화면 보호기] ▶ "다시 시작 할 때 암호로 보호" 체크 "대기 시간" 10분 설정
     echo ■ Windows 2008, 2012
     echo [Step 1] 제어판 ▶ 디스플레이 ▶ 화면보호기 변경 ▶ "다시 시작 할 때 로그온 화면 표시" 체크, "대기 시간" 10분 설정
     echo ■ Windows 2016, 2019
     echo [Step 1] 바탕화면 ▶ 마우스 우클릭 ▶개인 설정 ▶ 잠금 화면 ▶ 화면 보호기 설정 ▶ "다시 시작 할 때 로그온 화면 표시" 체크, "대기 시간" 10분 설정
-    echo ----------------------------------------------------------------------------------
+    exit /b
 )
+
+:end48
 
 pause
 goto SECURITY
@@ -3221,59 +3293,138 @@ REM -------------------------------------------4. W-49. 로그온 하지 않고 
 :ACCOUNT_W-49
 ECHO [W49] 로그온 하지 않고 시스템 종료 허용 해제.
 
-set regPath=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
-set regValue=ShutdownWithoutLogon
+REM 변수 초기화
+set "isFTPAccessControlConfigured=0"
+set "isAllowedIPConfigured=0"
+set "isAccessDeniedConfigured=0"
 
-for /f "tokens=3" %%i in ('reg query "%regPath%" /v "%regValue%" ^| findstr "%regValue%"') do (
-    set shutdownValue=%%i
+REM FTP 접근 제어 설정 확인
+for %%X in ("FTPAccessControl" "AllowedIP" "AccessDenied") do (
+    reg query "HKLM\System\CurrentControlSet\Services\MSFTPSVC\Parameters" /v "AllowAnonymous" | find "0x0" > nul
+    if %errorlevel% equ 0 (
+        set "is%%XConfigured=1"
+    )
 )
 
-if "%shutdownValue%"=="0" (
-    echo -------------------------------------------------------------------------------- >> good.txt
-    echo [ W = 49 로그온 하지 않고 시스템 종료 허용 해제 - 양호 ] >> good.txt
-    echo. >> good.txt
-    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용 안 함"으로 설정되어 있어 양호하다. - 수동점검 요망 >> good.txt
-    echo. >> good.txt
-    echo -------------------------------------------------------------------------------- >> good.txt
+REM 취약성 평가
+if %isFTPAccessControlConfigured% equ 1 (
+    if %isAllowedIPConfigured% equ 1 (
+        if %isAccessDeniedConfigured% equ 1 (
+            ECHO --------------------------------------------------------------------------------- >> good.txt
+            ECHO [ W-40 : FTP 접근 제어 설정 - 양호 ] >> good.txt
+            ECHO. >> good.txt
+            ECHO 설명: DFTP 서버는 특정 IP 주소에서만 접근 가능하도록 설정되어있어 양호하다. >> good.txt
+            ECHO --------------------------------------------------------------------------------- >> good.txt
+            ECHO. >> good.txt
+            ECHO. >> good.txt
 
-    echo --------------------------------------------------------------------------------
-    echo [ W = 49 로그온 하지 않고 시스템 종료 허용 해제 - 양호 ]
-    echo. 
-    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용 안 함"으로 설정되어 있어 양호하다. - 수동점검 요망
-    echo.
-    echo -------------------------------------------------------------------------------- 
+            ECHO --------------------------------------------------------------------------------- 
+            ECHO [ W-40 : FTP 접근 제어 설정 - 양호 ] 
+            ECHO. 
+            ECHO 설명: DFTP 서버는 특정 IP 주소에서만 접근 가능하도록 설정되어있어 양호하다. 
+            ECHO --------------------------------------------------------------------------------- 
+            ECHO. 
+            ECHO. 
+
+        ) else (
+            ECHO --------------------------------------------------------------------------------- >> bad.txt
+            ECHO. >> bad.txt
+            ECHO [ W-40 : FTP 접근 제어 설정 - 취약 ] >> bad.txt
+            ECHO. >> bad.txt
+            ECHO 설명 : FTP 서버는 특정 IP 주소에서만 접근 가능하도록 설정되었지만, 액세스 거부 설정이 누락되어있다. >> bad.txt
+            ECHO. >> bad.txt
+            ECHO [보안 조치] >> bad.txt
+            ECHO. >> bad.txt
+            ECHO Step 1: "실행 > INETMGR > 사이트 > 해당 웹페이지 > FTP IP 주소 및 도메인 제한" >> bad.txt
+            ECHO Step 2: "[작업]의 허용 항목 추가에서 FTP 접속을 허용할 IP 입력" >> bad.txt
+            ECHO Step 3: "[작업]의 지능 설정 편집에서 지정되지 않은 클라이언트에 대한 액세스를 거부 선택" >> bad.txt
+						ECHO ※ 이후 레지스트리 값이 변경되지 않을 수 있으므로 레지스트리 값도 설정 값과 맞는지 확인 필요 >> bad.txt
+            ECHO --------------------------------------------------------------------------------- >> bad.txt
+            ECHO. >> bad.txt
+            ECHO. >> bad.txt
+
+            ECHO --------------------------------------------------------------------------------- 
+            ECHO. 
+            ECHO [ W-40 : FTP 접근 제어 설정 - 취약 ] 
+            ECHO. 
+            ECHO 설명 : FTP 서버는 특정 IP 주소에서만 접근 가능하도록 설정되었지만, 액세스 거부 설정이 누락되어있다. 
+            ECHO. 
+            ECHO [보안 조치] 
+            ECHO. 
+            ECHO Step 1: "실행 > INETMGR > 사이트 > 해당 웹페이지 > FTP IP 주소 및 도메인 제한" 
+            ECHO Step 2: "[작업]의 허용 항목 추가에서 FTP 접속을 허용할 IP 입력" 
+            ECHO Step 3: "[작업]의 지능 설정 편집에서 지정되지 않은 클라이언트에 대한 액세스를 거부 선택" 
+						ECHO ※ 이후 레지스트리 값이 변경되지 않을 수 있으므로 레지스트리 값도 설정 값과 맞는지 확인 필요 >> bad.txt
+            ECHO --------------------------------------------------------------------------------- 
+            ECHO. 
+            ECHO. 
+        )
+    ) else (
+        ECHO --------------------------------------------------------------------------------- >> bad.txt
+        ECHO. >> bad.txt
+        ECHO [ W-40 : FTP 접근 제어 설정 - 취약 ] >> bad.txt
+        ECHO. >> bad.txt
+        ECHO 설명 : FTP 서버는 특정 IP 주소에서만 접근 가능하도록 설정되었지만, 허용 IP 주소가 누락되었다. >> bad.txt
+        ECHO. >> bad.txt
+        ECHO [보안 조치] >> bad.txt
+        ECHO. >> bad.txt
+        ECHO Step 1: "실행 > INETMGR > 사이트 > 해당 웹페이지 > FTP IP 주소 및 도메인 제한" >> bad.txt
+        ECHO Step 2: "[작업]의 허용 항목 추가에서 FTP 접속을 허용할 IP 입력" >> bad.txt
+        ECHO Step 3: "[작업]의 지능 설정 편집에서 지정되지 않은 클라이언트에 대한 액세스를 거부 선택" >> bad.txt
+				ECHO ※ 이후 레지스트리 값이 변경되지 않을 수 있으므로 레지스트리 값도 설정 값과 맞는지 확인 필요 >> bad.txt
+        ECHO --------------------------------------------------------------------------------- >> bad.txt
+        ECHO. >> bad.txt
+        ECHO. >> bad.txt
+
+        ECHO --------------------------------------------------------------------------------- 
+        ECHO. 
+        ECHO [ W-40 : FTP 접근 제어 설정 - 취약 ] 
+        ECHO. 
+        ECHO 설명 : FTP 서버는 특정 IP 주소에서만 접근 가능하도록 설정되었지만, 허용 IP 주소가 누락되었다. 
+        ECHO. 
+        ECHO [보안 조치] 
+        ECHO. 
+        ECHO Step 1: "실행 > INETMGR > 사이트 > 해당 웹페이지 > FTP IP 주소 및 도메인 제한" 
+        ECHO Step 2: "[작업]의 허용 항목 추가에서 FTP 접속을 허용할 IP 입력" 
+        ECHO Step 3: "[작업]의 지능 설정 편집에서 지정되지 않은 클라이언트에 대한 액세스를 거부 선택" 
+				ECHO ※ 이후 레지스트리 값이 변경되지 않을 수 있으므로 레지스트리 값도 설정 값과 맞는지 확인 필요 >> bad.txt
+        ECHO --------------------------------------------------------------------------------- 
+        ECHO. 
+        ECHO. 
+    )
 ) else (
-    echo ---------------------------------------------------------------------------------- >> bad.txt
-    echo [ W = 48 로그온 하지 않고 시스템 종료 허용 해제 - 취약 ] >> bad.txt
-    echo. >> bad.txt
-    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용"으로 설정되어 있어 취약하다. >> bad.txt
-    echo. >> bad.txt
-    echo [보안 조치] >> bad.txt
-    echo ■ Windows NT  >> bad.txt
-    echo [Step 1] HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\ShutdownWithoutLogon = 0  >> bad.txt
-    echo ■ Windows 2000  >> bad.txt
-    echo [Step 1] 시작 ▶ 실행 SECPOL.MSC ▶ 로컬 정책 ▶ 보안 옵션  >> bad.txt
-    echo [Step 2] "로그온 하지 않고 시스템 종료 허용"을 "사용 안 함"으로 설정  >> bad.txt
-    echo ■ Windows 2003, 2008, 2012, 2016, 2019  >> bad.txt
-    echo [Step 1] 시작 ▶ 실행 ▶ SECPOL.MSC ▶ 로컬 정책 ▶ 보안 옵션  >> bad.txt
-    echo [Step 2] "시스템 종료: 로그온 하지 않고 시스템 종료 허용"을 "사용 안 함"으로 설정  >> bad.txt
-    echo ---------------------------------------------------------------------------------- >> bad.txt
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO. >> bad.txt
+    ECHO [ W-40 : FTP 접근 제어 설정 - 확인필요 ] >> bad.txt
+    ECHO. >> bad.txt
+    ECHO 설명 : FTP 서버 기능이 활성화 되어 있지 않거나 접근 제어 설정이 구성되지 않아서 이경우 모든 클라이언트가 접근할 수 있음 >> bad.txt
+    ECHO. >> bad.txt
+    ECHO [보안 조치] >> bad.txt
+    ECHO. >> bad.txt
+    ECHO Step 1: "실행 > INETMGR > 사이트 > 해당 웹페이지 > FTP IP 주소 및 도메인 제한" >> bad.txt
+    ECHO Step 2: "[작업]의 허용 항목 추가에서 FTP 접속을 허용할 IP 입력" >> bad.txt
+    ECHO Step 3: "[작업]의 지능 설정 편집에서 지정되지 않은 클라이언트에 대한 액세스를 거부 선택" >> bad.txt
+		ECHO ※ 이후 레지스트리 값이 변경되지 않을 수 있으므로 레지스트리 값도 설정 값과 맞는지 확인 필요 >> bad.txt
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO. >> bad.txt
+    ECHO. >> bad.txt
 
-    echo ----------------------------------------------------------------------------------
-    echo [ W = 48 로그온 하지 않고 시스템 종료 허용 해제 - 취약 ]
-    echo.
-    echo 설명 : "로그온 하지 않고 시스템 종료 허용"이 "사용"으로 설정되어 있어 취약하다.
-    echo.
-    echo [보안 조치]
-    echo ■ Windows NT
-    echo [Step 1] HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\ShutdownWithoutLogon = 0
-    echo ■ Windows 2000
-    echo [Step 1] 시작 ▶ 실행 SECPOL.MSC ▶ 로컬 정책 ▶ 보안 옵션
-    echo [Step 2] "로그온 하지 않고 시스템 종료 허용"을 "사용 안 함"으로 설정
-    echo ■ Windows 2003, 2008, 2012, 2016, 2019
-    echo [Step 1] 시작 ▶ 실행 ▶ SECPOL.MSC ▶ 로컬 정책 ▶ 보안 옵션
-    echo [Step 2] "시스템 종료: 로그온 하지 않고 시스템 종료 허용"을 "사용 안 함"으로 설정
-    echo ----------------------------------------------------------------------------------
+
+    ECHO --------------------------------------------------------------------------------- 
+    ECHO. 
+    ECHO [ W-40 : FTP 접근 제어 설정 - 확인필요 ] 
+    ECHO. 
+    ECHO 설명 : FTP 서버 기능이 활성화 되어 있지 않거나 접근 제어 설정이 구성되지 않아서 이경우 모든 클라이언트가 접근할 수 있음 
+    ECHO. 
+    ECHO [보안 조치] 
+    ECHO. 
+    ECHO Step 1: "실행 > INETMGR > 사이트 > 해당 웹페이지 > FTP IP 주소 및 도메인 제한" 
+    ECHO Step 2: "[작업]의 허용 항목 추가에서 FTP 접속을 허용할 IP 입력" 
+    ECHO Step 3: "[작업]의 기능 설정 편집에서 지정되지 않은 클라이언트에 대한 액세스를 거부 선택" 
+		ECHO ※ 이후 레지스트리 값이 변경되지 않을 수 있으므로 레지스트리 값도 설정 값과 맞는지 확인 필요 >> bad.txt
+    ECHO --------------------------------------------------------------------------------- 
+    ECHO. 
+    ECHO. 
 )
 
 pause
