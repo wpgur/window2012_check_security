@@ -1214,11 +1214,9 @@ ECHO.
 REM -------------------------------------------20. W-38. FTP 디렉터리 접근권한 설정.
 :ACCOUNT_W-38
 ECHO [W38] FTP 디렉터리 접근권한 설정.
-setlocal enabledelayedexpansion
 
-set "ftpHomeDirectory=C:\inetpub\ftproot"
+%SystemRoot%\System32\inetsrv\appcmd.exe list config "web" -section:system.ftpServer/security/authorization | findstr /i "*" > nul
 
-icacls "!ftpHomeDirectory!" | findstr /C:"Everyone:(F)" > nul
 if errorlevel 1 (
     ECHO --------------------------------------------------------------------------------- >> good.txt
     ECHO [ W-38 : FTP 디렉터리 접근권한 설정 - 양호 ] >> good.txt
@@ -1236,34 +1234,36 @@ if errorlevel 1 (
 ) else (
     ECHO --------------------------------------------------------------------------------- >> bad.txt
     ECHO [ W-38 : FTP 디렉터리 접근권한 설정 - 취약 ] >> bad.txt
+    ECHO. >> bad.txt
     ECHO 설명 : FTP 홈 디렉토리에 Everyone 권한이 있어 취약하다. >> bad.txt
+    ECHO. >> bad.txt
     ECHO [보안 조치] >> bad.txt
     ECHO - Windows NT^(IIS 4.0^), 2000^(IIS 5.0^), 2003^(IIS 6.0^) >> bad.txt
-    ECHO Step 1: 인터넷 정보 서비스^(IIS^) 관리 > FTP 사이트 > 해당 FTP 사이트 > 속성 > [홈 디렉토리] 탭에서 FTP 홈 디렉토리 확인 >> bad.txt
-    ECHO Step 2: 탐색기 > 홈 디렉토리 > 속성 > [보안] 탭에서 Everyone 권한 제거>> bad.txt
+    ECHO Step 1: 인터넷 정보 서비스^(IIS^) 관리 ^> FTP 사이트 ^> 해당 FTP 사이트 ^> 속성 ^> [홈 디렉토리] 탭에서 FTP 홈 디렉토리 확인 >> bad.txt
+    ECHO Step 2: 탐색기 ^> 홈 디렉토리 ^> 속성 ^> [보안] 탭에서 Everyone 권한 제거>> bad.txt
     ECHO. >> bad.txt
     ECHO - Windows 2008^(IIS 7.0^), 2012^(IIS 8.0^) >> bad.txt
-    ECHO Step 1: 제어판 > 관리도구 > 인터넷 정보 서비스^(IIS^) 관리 > 해당 웹사이트 > 마우스 우클릭 > FTP 게시 추가  >> bad.txt
+    ECHO Step 1: 제어판 ^> 관리도구 ^> 인터넷 정보 서비스^(IIS^) 관리 ^> 해당 웹사이트 ^> 마우스 우클릭 ^> FTP 게시 추가  >> bad.txt
     ECHO Step 2: 이후 진행 과정에서 권한 부여 화면의 액세스 허용 대상 선정 시 [지정한 사용자]만 선택  >> bad.txt
     ECHO --------------------------------------------------------------------------------- >> bad.txt
     ECHO. >> bad.txt
 
     ECHO --------------------------------------------------------------------------------- 
     ECHO [ W-38 : FTP 디렉터리 접근권한 설정 - 취약 ] 
+    ECHO. 
     ECHO 설명 : FTP 홈 디렉토리에 Everyone 권한이 있어 취약하다. 
+    ECHO. 
     ECHO [보안 조치] 
     ECHO - Windows NT^(IIS 4.0^), 2000^(IIS 5.0^), 2003^(IIS 6.0^) 
-    ECHO Step 1: 인터넷 정보 서비스^(IIS^) 관리 > FTP 사이트 > 해당 FTP 사이트 > 속성 > [홈 디렉토리] 탭에서 FTP 홈 디렉토리 확인 
-    ECHO Step 2: 탐색기 > 홈 디렉토리 > 속성 > [보안] 탭에서 Everyone 권한 제거
+    ECHO Step 1: 인터넷 정보 서비스^(IIS^) 관리 ^> FTP 사이트 ^> 해당 FTP 사이트 ^> 속성 ^> [홈 디렉토리] 탭에서 FTP 홈 디렉토리 확인 
+    ECHO Step 2: 탐색기 ^> 홈 디렉토리 ^> 속성 ^> [보안] 탭에서 Everyone 권한 제거
     ECHO. 
     ECHO - Windows 2008^(IIS 7.0^), 2012^(IIS 8.0^) 
-    ECHO Step 1: 제어판 > 관리도구 > 인터넷 정보 서비스^(IIS^) 관리 > 해당 웹사이트 > 마우스 우클릭 > FTP 게시 추가  
+    ECHO Step 1: 제어판 ^> 관리도구 ^> 인터넷 정보 서비스^(IIS^) 관리 ^> 해당 웹사이트 ^> 마우스 우클릭 ^> FTP 게시 추가  
     ECHO Step 2: 이후 진행 과정에서 권한 부여 화면의 액세스 허용 대상 선정 시 [지정한 사용자]만 선택  
     ECHO --------------------------------------------------------------------------------- 
     ECHO. 
 )
-
-endlocal
 
 
 
