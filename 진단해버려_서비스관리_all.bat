@@ -1273,66 +1273,41 @@ REM -------------------------------------------21. W-39. Anonymous FTP 금지.
 :ACCOUNT_W-39
 ECHO [W39] Anonymous FTP 금지.
 
-net start | find "Microsoft FTP Service" > nul
-if errorlevel 1 (
+%SystemRoot%\System32\inetsrv\appcmd.exe list config "web" -section:system.applicationHost/sites | findstr /i /C:"anonymousAuthentication enabled" | find /i "false"
+if %errorlevel% EQU 0 (
     ECHO --------------------------------------------------------------------------------- >> good.txt
     ECHO [ W-39 : Anonymous FTP 금지 - 양호 ] >> good.txt
     ECHO. >> good.txt
-    ECHO 설명: FTP 서비스를 사용하지 않으므로 해당사항 없다. >> good.txt
+    ECHO 설명: "익명 연결 허용"이 되어 있지 않으므로 양호하다. >> good.txt
     ECHO --------------------------------------------------------------------------------- >> good.txt
     ECHO. >> good.txt
     ECHO. >> good.txt
     ECHO ---------------------------------------------------------------------------------
     ECHO [ W-39 : Anonymous FTP 금지 - 양호 ]
     ECHO.
-    ECHO 설명: FTP 서비스를 사용하지 않으므로 해당사항 없다. 
+    ECHO 설명: "익명 연결 허용"이 되어 있지 않으므로 양호하다.
     ECHO ---------------------------------------------------------------------------------
     ECHO.
     ECHO.
-)
-
-if not errorlevel 1 (
-    
-    reg query "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\ftpsvc\Parameters" /s | find /I "AllowAnonymous" > nul
-
-    if errorlevel 1 (
-        ECHO --------------------------------------------------------------------------------- >> good.txt
-        ECHO [ W-39 : Anonymous FTP 금지 - 양호 ] >> good.txt
-        ECHO. >> good.txt
-        ECHO 설명: "익명 연결 허용"이 되어 있지 않으므로 양호하다. >> good.txt
-        ECHO --------------------------------------------------------------------------------- >> good.txt
-        ECHO. >> good.txt
-        ECHO. >> good.txt
-        ECHO ---------------------------------------------------------------------------------
-        ECHO [ W-39 : Anonymous FTP 금지 - 양호 ]
-        ECHO.
-        ECHO 설명: "익명 연결 허용"이 되어 있지 않으므로 양호하다.
-        ECHO ---------------------------------------------------------------------------------
-        ECHO.
-        ECHO.
-    )
-    if not errorlevel 1 (
-        ECHO --------------------------------------------------------------------------------- >> bad.txt
-        ECHO [ W-39 : Anonymous FTP 금지 - 취약 ] >> bad.txt
-        ECHO 설명 : "익명 연결 허용"이 되어 있으므로 취약하다. >> bad.txt
-        ECHO [보안 조치] >> bad.txt
-        ECHO Step 1: 제어판 > 관리도구 >인터넷 정보 서비스 관리 > 해당 웹사이트 > 마우스 우클릭 >FTP 게시 추가 >> bad.txt
-        ECHO Step 2: 이후 진행 과정에서 인증 화면의 익명 체크 박스 해제 >> bad.txt
-        ECHO --------------------------------------------------------------------------------- >> bad.txt
-        ECHO. >> bad.txt
-        ECHO. >> bad.txt
-        ECHO ---------------------------------------------------------------------------------
-        ECHO [ W-39 : Anonymous FTP 금지 - 취약 ]
-        ECHO 설명 : "익명 연결 허용"이 되어 있으므로 취약하다.
-        ECHO [보안 조치]
-        ECHO Step 1: 제어판 > 관리도구 >인터넷 정보 서비스 관리 > 해당 웹사이트 > 마우스 우클릭 >FTP 게시 추가
-        ECHO Step 2: 이후 진행 과정에서 인증 화면의 익명 체크 박스 해제
-        ECHO ---------------------------------------------------------------------------------
-        ECHO.
-        ECHO.
-    )
-    
-    
+) else (
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO [ W-39 : Anonymous FTP 금지 - 취약 ] >> bad.txt
+    ECHO 설명 : "익명 연결 허용"이 되어 있으므로 취약하다. >> bad.txt
+    ECHO [보안 조치] >> bad.txt
+    ECHO Step 1: 제어판 > 관리도구 >인터넷 정보 서비스 관리 > 해당 웹사이트 > 마우스 우클릭 >FTP 게시 추가 >> bad.txt
+    ECHO Step 2: 이후 진행 과정에서 인증 화면의 익명 체크 박스 해제 >> bad.txt
+    ECHO --------------------------------------------------------------------------------- >> bad.txt
+    ECHO. >> bad.txt
+    ECHO. >> bad.txt
+    ECHO ---------------------------------------------------------------------------------
+    ECHO [ W-39 : Anonymous FTP 금지 - 취약 ]
+    ECHO 설명 : "익명 연결 허용"이 되어 있으므로 취약하다.
+    ECHO [보안 조치]
+    ECHO Step 1: 제어판 ^> 관리도구 ^>인터넷 정보 서비스 관리 ^> 해당 웹사이트 ^> 마우스 우클릭 ^>FTP 게시 추가
+    ECHO Step 2: 이후 진행 과정에서 인증 화면의 익명 체크 박스 해제
+    ECHO ---------------------------------------------------------------------------------
+    ECHO.
+    ECHO.
 )
 
 ECHO.
