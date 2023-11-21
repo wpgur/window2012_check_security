@@ -2309,8 +2309,7 @@ set vuln_found=0
 for %%i in (%vuln_mapping%) do (
     %windir%\system32\inetsrv\appcmd list config "web" -section:system.webServer/handlers | findstr /C:"%%i" > nul
     if !errorlevel! == 0 (
-        echo "%%i이 존재합니다." >> bad.txt
-	echo "%%i이 존재합니다."
+	    echo "%%i이 존재합니다."
         set vuln_found=1
     )
 )
@@ -2328,6 +2327,13 @@ if !vuln_found! equ 1 (
 	ECHO --------------------------------------------------------------------------------- >> bad.txt
 	ECHO [ W-33 : IIS 미사용 스크립트 매핑 제거 - 취약 ] >> bad.txt
 	ECHO 설명 : 취약한 매핑이 확인되었으므로 취약하다. >> bad.txt
+    for %%i in (%vuln_mapping%) do (
+        %windir%\system32\inetsrv\appcmd list config "web" -section:system.webServer/handlers | findstr /C:"%%i" > nul
+        if !errorlevel! == 0 (
+            echo "%%i이 존재합니다." >> bad.txt
+            set vuln_found=1
+        )
+    )
 	ECHO [보안 조치] >> bad.txt
 	ECHO. >> bad.txt
 	ECHO Step 1 : 시작 ^> 실행 ^> INETMGR ^> 웹 사이트 ^> 해당 웹사이트 ^> 처리기 매핑 선택 >> bad.txt
@@ -2631,7 +2637,7 @@ if %errorlevel% EQU 0 (
     ECHO [ W-39 : Anonymous FTP 금지 - 취약 ] >> bad.txt
     ECHO 설명 : "익명 연결 허용"이 되어 있으므로 취약하다. >> bad.txt
     ECHO [보안 조치] >> bad.txt
-    ECHO Step 1: 제어판 > 관리도구 >인터넷 정보 서비스 관리 > 해당 웹사이트 > 마우스 우클릭 >FTP 게시 추가 >> bad.txt
+    ECHO Step 1: 제어판 ^> 관리도구 ^>인터넷 정보 서비스 관리 ^> 해당 웹사이트 ^> 마우스 우클릭 ^>FTP 게시 추가 >> bad.txt
     ECHO Step 2: 이후 진행 과정에서 인증 화면의 익명 체크 박스 해제 >> bad.txt
     ECHO --------------------------------------------------------------------------------- >> bad.txt
     ECHO. >> bad.txt
