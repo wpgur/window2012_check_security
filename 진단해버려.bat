@@ -2523,7 +2523,7 @@ if not errorlevel 1 (
     ECHO [ W-37 : FTP 서비스 구동 점검 - 취약 ] >> bad.txt
     ECHO 설명 : FTP 서비스를 사용하므로 취약하다. >> bad.txt
     ECHO [보안 조치] >> bad.txt
-    ECHO Step 1: 시작 > 실행 > SERVICES.MSC > Microsoft FTP Publishing Service > 속성 > [일반] 탭에서 "시작 유형" 사용 안 함 으로 설정한 후, FTP 서비스 중지 >> bad.txt
+    ECHO "Step 1: 시작 > 실행 > SERVICES.MSC > Microsoft FTP Publishing Service > 속성 > [일반] 탭에서 "시작 유형" 사용 안 함 으로 설정한 후, FTP 서비스 중지" >> bad.txt
     ECHO --------------------------------------------------------------------------------- >> bad.txt
     ECHO. >> bad.txt
     ECHO. >> bad.txt
@@ -2531,7 +2531,7 @@ if not errorlevel 1 (
     ECHO [ W-37 : FTP 서비스 구동 점검 - 취약 ]
     ECHO 설명 : FTP 서비스를 사용하므로 취약하다.
     ECHO [보안 조치]
-    ECHO "Step 1: 시작 > 실행 > SERVICES.MSC > Microsoft FTP Publishing Service > 속성 > [일반] 탭에서 "시작 유형" 사용 안 함 으로 설정한 후, FTP 서비스 중지"
+    ECHO Step 1: 시작 ^> 실행 ^> SERVICES.MSC ^> Microsoft FTP Publishing Service ^> 속성 ^> [일반] 탭에서 "시작 유형" 사용 안 함 으로 설정한 후, FTP 서비스 중지
     ECHO ---------------------------------------------------------------------------------
     ECHO.
     ECHO.
