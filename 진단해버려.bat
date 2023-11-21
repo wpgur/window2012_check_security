@@ -2063,7 +2063,7 @@ if %errorlevel%==0 (
     ECHO. >> bad.txt
     ECHO [보안 조치] >> bad.txt
     ECHO. >> bad.txt
-    ECHO [Step 1] 시작 ▶ 실행 ▶ INETMGR ▶ 웹 사이트 ▶ 해당 웹사이트 ▶ ASP ▶ 제한 속성 확인
+    ECHO [Step 1] 시작 ▶ 실행 ▶ INETMGR ▶ 웹 사이트 ▶ 해당 웹사이트 ▶ ASP ▶ 제한 속성 확인 >> bad.txt
     ECHO [Step 2] Default 값 설정 >> bad.txt
     ECHO 1 최대 요청 엔터티 본문 제한 maxRequestEntityAllowed - 파일 업로드 용량 : Default 200000 byte >> bad.txt
     ECHO 2 응답 버퍼링 제한 bufferingLimit - 파일 다운로드 용량 : Default 4194304 byte >> bad.txt
