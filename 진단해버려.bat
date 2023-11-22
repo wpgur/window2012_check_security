@@ -2223,7 +2223,7 @@ REM -------------------------------------------14. W-32. IIS 데이터 파일 AC
 :ACCOUNT_W-32
 ECHO [W32] IIS 데이터 파일 ACL 적용.
 
-icacls C:\Inetpub\wwwroot\ | findstr /i "everyone"
+icacls C:\web | findstr /i "everyone"
 
 IF ERRORLEVEL 1 (
         ECHO ---------------------------------------------------------------------- >> good.txt
